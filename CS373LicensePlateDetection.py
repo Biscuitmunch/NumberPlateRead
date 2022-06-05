@@ -123,6 +123,31 @@ def computeThresholdGE(pixel_array, threshold_value, image_width, image_height):
                 pixel_array[i][j] = 0
     return pixel_array
 
+def computeDilation8Nbh3x3FlatSE(pixel_array, image_width, image_height):
+    
+    end_array = createInitializedGreyscalePixelArray(image_width, image_height)
+    
+    new_array = createInitializedGreyscalePixelArray(image_width+2, image_height+2)
+    
+    for j in range(0, image_width):
+        for i in range(0, image_height):
+            new_array[i+1][j+1] = pixel_array[i][j]
+    
+    for i in range(1, image_height+1):
+        for j in range(1, image_width+1):
+            
+            sumn = 0
+            
+            for x in range(3):
+                for y in range(3):
+                    if new_array[x+i-1][y+j-1] > 0:
+                        sumn = sumn + 1
+            
+            if sumn > 0:
+                end_array[i-1][j-1] = 1
+                
+    return end_array
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -165,15 +190,27 @@ def main():
 
     # STUDENT IMPLEMENTATION here
 
+    # Removing RGB for greyscale
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
 
+    # Scaling to take up full 8 bit scale
     px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
 
+    # Taking standard deviation in a 5x5 range around each pixel (shows more clearly where groupings are, like a license plate)
     px_array = computeStandardDeviationImage5x5(px_array, image_width, image_height)
 
+    # Scaling to take up full 8 bit scale
     px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
 
+    # Making light pixels white and dark pixels black
     px_array = computeThresholdGE(px_array, 150, image_width, image_height)
+
+    # Connecting places that are heavy in white/black
+    for i in range(3):
+        px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
+
+
+        
 
     # compute a dummy bounding box centered in the middle of the input image, and with as size of half of width and height
     center_x = image_width / 2.0
