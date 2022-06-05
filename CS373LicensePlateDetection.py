@@ -114,6 +114,15 @@ def computeStandardDeviationImage5x5(pixel_array, image_width, image_height):
     
     return end_result
 
+def computeThresholdGE(pixel_array, threshold_value, image_width, image_height):
+    for i in range(image_height):
+        for j in range(image_width):
+            if (pixel_array[i][j] >= threshold_value):
+                pixel_array[i][j] = 255
+            else:
+                pixel_array[i][j] = 0
+    return pixel_array
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -163,6 +172,8 @@ def main():
     px_array = computeStandardDeviationImage5x5(px_array, image_width, image_height)
 
     px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
+
+    px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # compute a dummy bounding box centered in the middle of the input image, and with as size of half of width and height
     center_x = image_width / 2.0
