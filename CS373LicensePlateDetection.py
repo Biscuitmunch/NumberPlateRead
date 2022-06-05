@@ -90,6 +90,30 @@ def scaleTo0And255AndQuantize(pixel_array, image_width, image_height):
             
     return array_greyscale
 
+def computeStandardDeviationImage5x5(pixel_array, image_width, image_height):
+    
+    end_result = createInitializedGreyscalePixelArray(image_width, image_height, 0.0)
+    
+    for i in range(2, image_height-2):
+        for j in range(2, image_width-2):
+            pixel_sum = 0
+            for x in range(-2, 3):
+                for y in range(-2, 3):
+                    pixel_sum = pixel_sum + pixel_array[i+x][j+y]
+
+            mean = (1/25) * pixel_sum
+
+            variance_sum = 0
+            for x in range(-2, 3):
+                for y in range(-2, 3):
+                    variance_sum = variance_sum + (pixel_array[i+x][j+y] - mean)**2
+
+            deviation = (variance_sum/25)**0.5
+            
+            end_result[i][j] = deviation
+    
+    return end_result
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -133,6 +157,10 @@ def main():
     # STUDENT IMPLEMENTATION here
 
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
+
+    px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
+
+    px_array = computeStandardDeviationImage5x5(px_array, image_width, image_height)
 
     px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
 
