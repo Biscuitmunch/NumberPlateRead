@@ -148,6 +148,25 @@ def computeDilation8Nbh3x3FlatSE(pixel_array, image_width, image_height):
                 
     return end_array
 
+def computeErosion8Nbh3x3FlatSE(pixel_array, image_width, image_height): # TODO boundary should be ZEROS
+    
+    end_array = createInitializedGreyscalePixelArray(image_width, image_height)
+    
+    for i in range(1, image_height-1):
+        for j in range(1, image_width-1):
+            
+            sumn = 0
+            
+            for x in range(3):
+                for y in range(3):
+                    if pixel_array[x+i-1][y+j-1] > 0:
+                        sumn = sumn + 1
+            
+            if sumn == 9:
+                end_array[i][j] = 1
+                
+    return end_array
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -209,7 +228,9 @@ def main():
     for i in range(3):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
-
+    # Eroding weaker odd-out colors
+    for i in range(3):
+        px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
         
 
     # compute a dummy bounding box centered in the middle of the input image, and with as size of half of width and height
