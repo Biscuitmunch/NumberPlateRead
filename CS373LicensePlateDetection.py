@@ -55,6 +55,40 @@ def createInitializedGreyscalePixelArray(image_width, image_height, initValue = 
     return new_array
 
 
+def computeRGBToGreyscale(pixel_array_r, pixel_array_g, pixel_array_b, image_width, image_height):
+    
+    greyscale_pixel_array = createInitializedGreyscalePixelArray(image_width, image_height)
+    
+    for i in range(image_height):
+        for j in range(image_width):
+            greyscale_pixel_array[i][j] = round(0.299*pixel_array_r[i][j] + 0.587*pixel_array_g[i][j] + 0.114*pixel_array_b[i][j])
+    
+    return greyscale_pixel_array
+
+def scaleTo0And255AndQuantize(pixel_array, image_width, image_height):
+    array_greyscale = createInitializedGreyscalePixelArray(image_width, image_height)
+    min = 256
+    max = -1
+    for i in range(image_height):
+        for j in range(image_width):
+            if (pixel_array[i][j] < min):
+                min = pixel_array[i][j]
+            if (pixel_array[i][j] > max):
+                max = pixel_array[i][j]
+        
+    range_vals = max-min
+    if range_vals == 0:
+        multiplier = 0
+    else:
+        multiplier = 255/range_vals
+        
+    for i in range(image_height):
+        for j in range(image_width):
+            array_greyscale[i][j] = round((pixel_array[i][j]-min)*multiplier)
+            if array_greyscale[i][j] == -1:
+                array_greyscale[i][j] = 0
+            
+    return array_greyscale
 
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
@@ -98,7 +132,9 @@ def main():
 
     # STUDENT IMPLEMENTATION here
 
-    px_array = px_array_r
+    px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
+
+    px_array = scaleTo0And255AndQuantize(px_array, image_width, image_height)
 
     # compute a dummy bounding box centered in the middle of the input image, and with as size of half of width and height
     center_x = image_width / 2.0
