@@ -307,6 +307,8 @@ def main():
 
     # STUDENT IMPLEMENTATION here
 
+    # All methods/functions I am using are up above the main function. Thank you!
+
     # Removing RGB for greyscale
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
 
@@ -345,14 +347,10 @@ def main():
     bbox_max_x = last_coords[0]
     bbox_max_y = last_coords[1]
 
-
-
-
-
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image of detection')
     axs1[1, 1].imshow(px_array, cmap='gray')
-    rect = Rectangle((bbox_min_x, bbox_min_y), bbox_max_x - bbox_min_x, bbox_max_y - bbox_min_y, linewidth=3,
+    rect = Rectangle((bbox_min_x, bbox_min_y), bbox_max_x - bbox_min_x, bbox_max_y - bbox_min_y, linewidth=2,
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
 
