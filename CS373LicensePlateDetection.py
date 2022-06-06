@@ -54,6 +54,21 @@ def createInitializedGreyscalePixelArray(image_width, image_height, initValue = 
     new_array = [[initValue for x in range(image_width)] for y in range(image_height)]
     return new_array
 
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0,item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
 
 def computeRGBToGreyscale(pixel_array_r, pixel_array_g, pixel_array_b, image_width, image_height):
     
@@ -167,6 +182,89 @@ def computeErosion8Nbh3x3FlatSE(pixel_array, image_width, image_height): # TODO 
                 
     return end_array
 
+def computeConnectedComponentLabeling(pixel_array, image_width, image_height):
+
+    visited = {}
+
+    myQueue = Queue()
+
+    replace = 1
+
+    for i in range(image_height):
+        for j in range(image_width):
+            visited[i,j] = 0
+    
+    for i in range(image_height):
+        for j in range(image_width):
+
+            if (visited[i,j] == 1):
+                continue
+            
+            if (pixel_array[i][j] != 0):
+                myQueue.items.insert(0, [i,j])
+            
+            else:
+                visited[i,j] == 1
+                continue
+
+            while (myQueue.isEmpty() == False):
+                temp = myQueue.items.pop()
+
+                pixel_array[temp[0]][temp[1]] = replace
+
+                if (temp[1] - 1 >= 0 and visited[temp[0], temp[1] - 1] == 0 and pixel_array[temp[0]][temp[1]-1] != 0):
+                    myQueue.items.insert(0, [temp[0],temp[1] - 1])
+                    visited[temp[0],temp[1] - 1] = 1
+
+                if (temp[1] + 1 < image_width and visited[temp[0], temp[1]+1] == 0 and pixel_array[temp[0]][temp[1]+1] != 0):
+                    myQueue.items.insert(0, [temp[0],temp[1]+1])
+                    visited[temp[0],temp[1] + 1] = 1
+
+                if (temp[0] - 1 >= 0 and visited[temp[0]-1, temp[1]] == 0 and pixel_array[temp[0]-1][temp[1]] != 0):
+                    myQueue.items.insert(0, [temp[0]-1,temp[1]])
+                    visited[temp[0] - 1,temp[1]] = 1
+
+                if (temp[0] + 1 < image_height and visited[temp[0]+1, temp[1]] == 0 and pixel_array[temp[0]+1][temp[1]] != 0):
+                    myQueue.items.insert(0, [temp[0]+1,temp[1]])
+                    visited[temp[0] + 1,temp[1]] = 1
+        
+
+
+            replace = replace + 1
+
+    dictionary_values = {}
+    
+    for i in range(image_height):
+        for j in range(image_width):
+            
+            if pixel_array[i][j] != 0:
+                if pixel_array[i][j] in dictionary_values:
+                    dictionary_values[pixel_array[i][j]] = dictionary_values[pixel_array[i][j]] + 1
+                else:
+                    dictionary_values[pixel_array[i][j]] = 1
+
+    return pixel_array, dictionary_values
+
+def FindPlateCoords(pixel_array, key_value, image_width, image_height):
+    left_x = 999999999
+    top_y = 999999999
+    right_x = -999999999
+    bottom_y = -999999999
+
+    for i in range(image_height):
+        for j in range(image_width):
+            if pixel_array[i][j] == key_value:
+                if j < left_x:
+                    left_x = j
+                if i < top_y:
+                    top_y = i
+                if j > right_x:
+                    right_x = j
+                if i > bottom_y:
+                    bottom_y = i
+
+    return [left_x, bottom_y], [right_x, top_y]
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -225,21 +323,27 @@ def main():
     px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # Connecting places that are heavy in white/black
-    for i in range(3):
+    for i in range(5):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # Eroding weaker odd-out colors
-    for i in range(3):
+    for i in range(5):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
         
+    # Finding the largest connected image part, most likely the license plate
+    connected_array, label_dictionary = computeConnectedComponentLabeling(px_array, image_width, image_height)
 
-    # compute a dummy bounding box centered in the middle of the input image, and with as size of half of width and height
-    center_x = image_width / 2.0
-    center_y = image_height / 2.0
-    bbox_min_x = center_x - image_width / 4.0
-    bbox_max_x = center_x + image_width / 4.0
-    bbox_min_y = center_y - image_height / 4.0
-    bbox_max_y = center_y + image_height / 4.0
+    # Taking the label of the license plate connected pixels
+    number_plate_label = max(label_dictionary, key=label_dictionary.get)
+
+    # Finding the corner co-ordinates of the license plate
+    first_coords, last_coords = FindPlateCoords(connected_array, number_plate_label, image_width, image_height)
+
+    # Outlining the co-ordinates where the license plate is
+    bbox_min_x = first_coords[0]
+    bbox_min_y = first_coords[1]
+    bbox_max_x = last_coords[0]
+    bbox_max_y = last_coords[1]
 
 
 
@@ -248,7 +352,7 @@ def main():
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image of detection')
     axs1[1, 1].imshow(px_array, cmap='gray')
-    rect = Rectangle((bbox_min_x, bbox_min_y), bbox_max_x - bbox_min_x, bbox_max_y - bbox_min_y, linewidth=1,
+    rect = Rectangle((bbox_min_x, bbox_min_y), bbox_max_x - bbox_min_x, bbox_max_y - bbox_min_y, linewidth=3,
                      edgecolor='g', facecolor='none')
     axs1[1, 1].add_patch(rect)
 
