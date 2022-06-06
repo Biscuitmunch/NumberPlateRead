@@ -265,6 +265,27 @@ def FindPlateCoords(pixel_array, key_value, image_width, image_height):
 
     return [left_x, bottom_y], [right_x, top_y]
 
+def FindPlateCoordsWithRatio(pixel_array, key_value, label_dictionary, image_width, image_height):
+
+    default_first_coords, default_last_coords = FindPlateCoords(pixel_array, key_value, image_width, image_height)
+
+    for i in range(5):
+        first_coords, last_coords = FindPlateCoords(pixel_array, key_value, image_width, image_height)
+
+        x_distance = last_coords[0] - first_coords[0]
+        y_distance = first_coords[1] - last_coords[1]
+
+        if (x_distance/y_distance < 6 and x_distance/y_distance > 1.5):
+            print("worked")
+            return first_coords, last_coords
+    
+        else:
+            label_dictionary[key_value] = 0
+            key_value = max(label_dictionary, key=label_dictionary.get)
+
+    print("didnt work")
+    return default_first_coords, default_last_coords
+
 # This is our code skeleton that performs the license plate detection.
 # Feel free to try it on your own images of cars, but keep in mind that with our algorithm developed in this lecture,
 # we won't detect arbitrary or difficult to detect license plates!
@@ -325,11 +346,11 @@ def main():
     px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # Connecting places that are heavy in white/black
-    for i in range(3):
+    for i in range(4):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # Eroding weaker odd-out colors
-    for i in range(2):
+    for i in range(4):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
         
     # Finding the largest connected image part, most likely the license plate
@@ -339,7 +360,10 @@ def main():
     number_plate_label = max(label_dictionary, key=label_dictionary.get)
 
     # Finding the corner co-ordinates of the license plate
-    first_coords, last_coords = FindPlateCoords(connected_array, number_plate_label, image_width, image_height)
+    #first_coords, last_coords = FindPlateCoords(connected_array, number_plate_label, image_width, image_height)
+
+    # If ratio is off, loop top 5 until acceptable ratio, otherwise license plate was not able to be found
+    first_coords, last_coords = FindPlateCoordsWithRatio(connected_array, number_plate_label, label_dictionary, image_width, image_height)
 
     # Outlining the co-ordinates where the license plate is
     bbox_min_x = first_coords[0]
