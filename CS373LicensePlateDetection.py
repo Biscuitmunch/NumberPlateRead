@@ -325,11 +325,11 @@ def main():
     px_array = computeThresholdGE(px_array, 150, image_width, image_height)
 
     # Connecting places that are heavy in white/black
-    for i in range(4):
+    for i in range(3):
         px_array = computeDilation8Nbh3x3FlatSE(px_array, image_width, image_height)
 
     # Eroding weaker odd-out colors
-    for i in range(4):
+    for i in range(2):
         px_array = computeErosion8Nbh3x3FlatSE(px_array, image_width, image_height)
         
     # Finding the largest connected image part, most likely the license plate
@@ -346,6 +346,7 @@ def main():
     bbox_min_y = first_coords[1]
     bbox_max_x = last_coords[0]
     bbox_max_y = last_coords[1]
+
 
     # Putting image back to greyscale for the user to see
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
