@@ -375,8 +375,18 @@ def main():
     # Putting image back to greyscale for the user to see
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
 
-    # EXTENSION METHODS CALLED HERE
+    # EXTENSION METHODS CALLED HERE ================================================
+    
+    # Saving a smaller image of just number plate
     CS373Extension.SaveLicensePlateImage(px_array, bbox_min_x, bbox_min_y, bbox_max_x, bbox_max_y)
+    
+    # Reducing images file size
+    CS373Extension.CompressImage()
+
+    # Calling image to the API, and printing out the result
+    CS373Extension.PrintPlateFromAPI()
+
+    # EXTENSION METHODS STOP HERE ==================================================
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image of detection')
