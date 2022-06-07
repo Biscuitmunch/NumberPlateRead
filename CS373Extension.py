@@ -26,11 +26,11 @@ def CompressImage(image_name="current_plate.png"):
 
 
 # Make the API request to the tesseract API
-def TesseractAPIRequest(image_name="current_plate.png"):
+def TesseractAPIRequest(image_name="current_plate.png", engine_num=2):
 
     payload = {'isOverlayRequired': True,
                'apikey': 'K82744958488957',
-               'OCREngine': 2,
+               'OCREngine': engine_num,
                'language': 'eng',
                }
     with open(image_name, 'rb') as imagefile:
@@ -41,12 +41,42 @@ def TesseractAPIRequest(image_name="current_plate.png"):
     return saved_data.content.decode()
 
 
+def ParseData(request_data):
+
+    try:
+        plate_text = request_data.get("ParsedResults")[0].get("ParsedText")
+    except:
+        print("Unable to find a number plate, trying different tesseract engine.")
+        return "error_no_plate"
+
+    return plate_text
+
+
 def PrintPlateFromAPI():
-    request_data = TesseractAPIRequest()
+    request_data = TesseractAPIRequest("current_plate.png", 2)
 
     request_data = json.loads(request_data)
 
-    plate_text = request_data.get("ParsedResults")[0].get("ParsedText")
+    plate_text = ParseData(request_data) 
+
+    # If engine 2 failed, try engine 1
+    if plate_text == "error_no_plate":
+        request_data = TesseractAPIRequest("current_plate.png", 1)
+        request_data = json.loads(request_data)
+
+        plate_text = ParseData(request_data)
+
+    # If engine 1 failed, try engine 3
+    if plate_text == "error_no_plate":
+        request_data = TesseractAPIRequest("current_plate.png", 3)
+        request_data = json.loads(request_data)
+
+        plate_text = ParseData(request_data)
+
+    # No engines worked, unable to find text
+    if plate_text == "error_no_plate":
+        print("Was unable to find number plate details, please try a different number plate")
+        return
 
     print("{ TEXT ON NUMBER PLATE }")
 
