@@ -275,7 +275,7 @@ def FindPlateCoordsWithRatio(pixel_array, key_value, label_dictionary, image_wid
         x_distance = last_coords[0] - first_coords[0]
         y_distance = first_coords[1] - last_coords[1]
 
-        if (x_distance/y_distance < 6 and x_distance/y_distance > 1.5):
+        if (x_distance/y_distance < 5.5 and x_distance/y_distance > 2.2):
             print("worked")
             return first_coords, last_coords
     
