@@ -1,6 +1,7 @@
 import math
 import sys
 from pathlib import Path
+import CS373Extension
 
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
@@ -371,9 +372,11 @@ def main():
     bbox_max_x = last_coords[0]
     bbox_max_y = last_coords[1]
 
-
     # Putting image back to greyscale for the user to see
     px_array = computeRGBToGreyscale(px_array_r, px_array_g, px_array_b, image_width, image_height)
+
+    # EXTENSION METHODS CALLED HERE
+    CS373Extension.SaveLicensePlateImage(px_array, bbox_min_x, bbox_min_y, bbox_max_x, bbox_max_y)
 
     # Draw a bounding box as a rectangle into the input image
     axs1[1, 1].set_title('Final image of detection')
