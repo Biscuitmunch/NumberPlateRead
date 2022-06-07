@@ -1,13 +1,16 @@
+# jwel929
 import math
 import sys
 from pathlib import Path
-import CS373Extension
 
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
 
 # import our basic, light-weight png reader library
 import imageIO.png
+
+# import for the assignment extension
+import CS373Extension
 
 # this function reads an RGB color png file and returns width, height, as well as pixel arrays for r,g,b
 def readRGBImageToSeparatePixelArrays(input_filename):
@@ -277,14 +280,12 @@ def FindPlateCoordsWithRatio(pixel_array, key_value, label_dictionary, image_wid
         y_distance = first_coords[1] - last_coords[1]
 
         if (x_distance/y_distance < 5.5 and x_distance/y_distance > 2.2):
-            print("worked")
             return first_coords, last_coords
     
         else:
             label_dictionary[key_value] = 0
             key_value = max(label_dictionary, key=label_dictionary.get)
 
-    print("didnt work")
     return default_first_coords, default_last_coords
 
 # This is our code skeleton that performs the license plate detection.

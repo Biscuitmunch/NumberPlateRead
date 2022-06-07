@@ -48,4 +48,8 @@ def PrintPlateFromAPI():
 
     plate_text = request_data.get("ParsedResults")[0].get("ParsedText")
 
+    print("{ TEXT ON NUMBER PLATE }")
+
     print(plate_text)
+
+    print("==== END OF PROGRAM ====")
