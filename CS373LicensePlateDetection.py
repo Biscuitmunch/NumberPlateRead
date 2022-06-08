@@ -10,7 +10,7 @@ from matplotlib.patches import Rectangle
 import imageIO.png
 
 # import for the assignment extension
-import CS373Extension
+#import CS373Extension
 
 # this function reads an RGB color png file and returns width, height, as well as pixel arrays for r,g,b
 def readRGBImageToSeparatePixelArrays(input_filename):
@@ -379,13 +379,13 @@ def main():
     # EXTENSION METHODS CALLED HERE ================================================
     
     # Saving a smaller image of just number plate
-    CS373Extension.SaveLicensePlateImage(px_array, bbox_min_x, bbox_min_y, bbox_max_x, bbox_max_y)
+    #CS373Extension.SaveLicensePlateImage(px_array, bbox_min_x, bbox_min_y, bbox_max_x, bbox_max_y)
     
     # Reducing images file size
-    CS373Extension.CompressImage()
+    #CS373Extension.CompressImage()
 
     # Calling image to the API, and printing out the result
-    CS373Extension.PrintPlateFromAPI()
+    #CS373Extension.PrintPlateFromAPI()
 
     # EXTENSION METHODS STOP HERE ==================================================
 

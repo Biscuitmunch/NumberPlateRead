@@ -28,6 +28,7 @@ def CompressImage(image_name="current_plate.png"):
 # Make the API request to the tesseract API
 def TesseractAPIRequest(image_name="current_plate.png", engine_num=2):
 
+    # This is my API key, and I am leaving it in here for convenience of the marker so please remove the API key before posting anywhere else :)
     payload = {'isOverlayRequired': True,
                'apikey': 'K82744958488957',
                'OCREngine': engine_num,
