@@ -8,7 +8,9 @@ I hope you enjoy!
 
 
 To run extension:
+
 Install requirements.txt
+
 Uncomment lines of CS373LicensePlateDetection.py: 
 
 13: #import CS373Extension
